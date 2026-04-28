@@ -32,6 +32,7 @@ tasks:
         find . -path "./integrationtests/workspaces" -prune -o \
           -path "./integrationtests/test-output" -prune -o \
           -name "*.go" -print | xargs gopls check
+      - go tool govulncheck ./...
 
   clean:
     desc: Remove generated artifacts and expire Go test cache entries
