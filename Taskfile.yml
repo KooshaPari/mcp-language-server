@@ -18,8 +18,11 @@ tasks:
   lint:
     desc: Run Go formatting, static analysis, and LSP checks
     cmds:
-      - gofmt -l .
-      - test -z "$(gofmt -l .)"
+      - |
+        unformatted="$(find . -path "./integrationtests/workspaces" -prune -o \
+          -path "./integrationtests/test-output" -prune -o \
+          -name "*.go" -print | xargs gofmt -l)"
+        test -z "$unformatted" || { printf '%s\n' "$unformatted"; exit 1; }
       - go tool staticcheck ./...
       - go tool errcheck ./...
       - |
@@ -28,9 +31,9 @@ tasks:
           -name "*.go" -print | xargs gopls check
 
   clean:
-    desc: Remove Go build and coverage artifacts
+    desc: Remove Go build, test cache, and coverage artifacts
     cmds:
-      - go clean ./...
+      - go clean -cache -testcache
       - task: clean:artifacts
 
   clean:artifacts:
